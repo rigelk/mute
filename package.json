@@ -4,7 +4,7 @@
   "description": "QuickStart package.json from the documentation, supplemented with testing support",
   "scripts": {
     "ng": "ng",
-    "prestart": "pm2 gracefulReload process.yml",
+    "prestart": "npm run sigver",
     "start": "ng serve --host 0.0.0.0 --disable-host-check --watch",
     "prebuild": "sed -i -- \"s/'.*'/'$(git log -n 1 --pretty=format:'%H')'/g\" src/lastcommithash.ts",
     "build": "ng build --prod",
@@ -13,12 +13,14 @@
     "postbuilddev": "tar -cvf dist/mute.tar.gz -C dist . && scp dist/mute.tar.gz ovhmute:/root/container/mute",
     "lint": "ng lint --type-check",
     "test": "ng test",
+    "pree2e": "npm run sigver",
     "e2e": "ng e2e",
     "proto": "pbjs -t static-module -w commonjs --no-verify --no-delimited --no-convert -o src/app/doc/network/message_pb.js src/app/doc/network/message.proto && pbts -o src/app/doc/network/message_pb.d.ts src/app/doc/network/message_pb.js && pbjs -t static-module -w commonjs --no-verify --no-delimited --no-convert -o src/app/doc/editor/cursor/cursor_pb.js src/app/doc/editor/cursor/cursor.proto && pbts -o src/app/doc/editor/cursor/cursor_pb.d.ts src/app/doc/editor/cursor/cursor_pb.js",
     "precommit": "npm run lint",
     "commitmsg": "validate-commit-msg",
     "cz": "git-cz",
-    "build-desktop": "nativefier --name 'Mute' 'https://www.coedit.re' ./dist-desktop"
+    "build-desktop": "nativefier --name 'Mute' 'https://www.coedit.re' ./dist-desktop",
+    "sigver": "pm2 gracefulReload process.yml"
   },
   "keywords": [],
   "contributors": [
