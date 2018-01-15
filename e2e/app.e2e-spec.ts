@@ -1,14 +1,12 @@
-import { MyProjectPage } from './app.po'
+import { browser } from 'protractor'
 
-describe('my-project App', () => {
-  let page: MyProjectPage
+describe('mute App', () => {
 
-  beforeEach(() => {
-    page = new MyProjectPage()
-  })
+  beforeEach(() => {})
 
-  it('should display message saying app works', () => {
-    page.navigateTo()
-    expect(page.getParagraphText()).toEqual('app works!')
+  it('should have a title', async () => {
+    await browser.get('/')
+    const actualTitle = await browser.getTitle()
+    expect(actualTitle).toEqual('Mute')
   })
 })
