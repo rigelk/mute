@@ -5,4 +5,6 @@ node_js:
 - '7'
 addons:
   chrome: stable
+before_script:
+  - ./node_modules/.bin/webdriver-manager update
 script: npm run e2e
