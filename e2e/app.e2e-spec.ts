@@ -15,6 +15,12 @@ describe('mute App', () => {
     await browser.waitForAngular()
   })
 
+  // TODO: Fix this test
+  xit('angular should stabilize on doc page', async () => {
+    await browser.get('/test-e2e-stabilize')
+    await browser.waitForAngular()
+  })
+
   it('should have a title', async () => {
     await browser.get('/')
     const actualTitle = await browser.getTitle()
