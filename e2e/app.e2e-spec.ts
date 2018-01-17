@@ -10,6 +10,11 @@ describe('mute App', () => {
 
   beforeEach(() => {})
 
+  it('angular should stabilize on docs page', async () => {
+    await browser.get('/')
+    await browser.waitForAngular()
+  })
+
   it('should have a title', async () => {
     await browser.get('/')
     const actualTitle = await browser.getTitle()
