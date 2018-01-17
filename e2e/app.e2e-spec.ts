@@ -59,4 +59,18 @@ describe('mute App', () => {
     const actualText2 = await getEditorValue(browser)
     expect(actualText2).toEqual(expectedText2)
   })
+
+  it('should retrieve updates from peers when connecting', async () => {
+    const expectedText = 'Hello world !'
+    const peerBrowser: ProtractorBrowser =  await browser.forkNewDriverInstance().ready
+
+    await browser.get('/test-e2e-retrieve-doc-on-connection')
+    await focusEditor(browser)
+    await browser.actions().sendKeys(expectedText).perform()
+
+    await peerBrowser.get('/test-e2e-retrieve-doc-on-connection')
+    await sleep(1000)
+    const actualText = await getEditorValue(peerBrowser)
+    expect(actualText).toEqual(expectedText)
+  })
 })
