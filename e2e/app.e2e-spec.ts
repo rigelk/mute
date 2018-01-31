@@ -37,6 +37,20 @@ describe('mute App', () => {
     expect(actualText).toEqual(expectedText)
   })
 
+  it('should connect to peers', async () => {
+    await browser.get('/test-e2e-connect')
+    await browser.waitForAngular()
+    const browserState = await browser.executeScript('return wg.state')
+    expect(browserState).toEqual(1) // Connected
+
+    const peerBrowser: ProtractorBrowser =  await browser.forkNewDriverInstance(true).ready
+    await peerBrowser.waitForAngular()
+    const peerBrowserState = await browser.executeScript('return wg.state')
+    expect(peerBrowserState).toEqual(1) // Connected
+
+    await peerBrowser.quit()
+  })
+
   it('should broadcast updates to peers', async () => {
     const expectedText1 = 'Hellow'
     const expectedText2 = 'Hello world !'
