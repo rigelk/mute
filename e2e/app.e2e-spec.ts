@@ -68,7 +68,9 @@ describe('mute App', () => {
     await browser.actions().sendKeys(expectedText).perform()
 
     await peerBrowser.get('/test-e2e-retrieve-doc-on-connection')
-    await browser.waitForAngular()
+    await peerBrowser.waitForAngular() // Join the network
+    await browser.waitForAngular() // Send the updates
+    await peerBrowser.waitForAngular() // Handle the updates
     const actualText = await getEditorValue(peerBrowser)
     expect(actualText).toEqual(expectedText)
 
