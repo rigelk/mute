@@ -29,6 +29,7 @@ describe('mute App', () => {
     await browser.waitForAngular()
     await focusEditor(browser)
     await browser.actions().sendKeys(expectedText).perform()
+    await browser.sleep(1000) // Leave some time to the app to store updates
     await browser.waitForAngular()
     await browser.refresh()
     await browser.waitForAngular()
@@ -41,12 +42,14 @@ describe('mute App', () => {
     const expectedText2 = 'Hello world !'
     await browser.get('/test-e2e-broadcast')
     const peerBrowser: ProtractorBrowser =  await browser.forkNewDriverInstance(true).ready
+    await peerBrowser.waitForAngular()
     await browser.waitForAngular()
 
     await focusEditor(browser)
     await focusEditor(peerBrowser)
 
     await browser.actions().sendKeys(expectedText1).perform()
+    await browser.sleep(1000) // Leave some time to the app to store updates
     await browser.waitForAngular()
     const actualText1 = await getEditorValue(peerBrowser)
     expect(actualText1).toEqual(expectedText1)
@@ -88,6 +91,7 @@ describe('mute App', () => {
     await browser.waitForAngular()
     await focusEditor(browser)
     await browser.actions().sendKeys(expectedText).perform()
+    await browser.sleep(1000) // Leave some time to the app to store updates
     await browser.waitForAngular()
 
     // Leave the collaboration before other peer joins
