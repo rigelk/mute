@@ -87,9 +87,8 @@ describe('mute App', () => {
     await browser.actions().sendKeys(expectedText).perform()
 
     await peerBrowser.get('/test-e2e-retrieve-doc-on-connection')
-    await peerBrowser.waitForAngular() // Join the network
-    await browser.waitForAngular() // Send the updates
-    await peerBrowser.waitForAngular() // Handle the updates
+    await waitUntilEditorNotEmpty(peerBrowser) // Handle the updates
+    await peerBrowser.waitForAngular()
     const actualText = await getEditorValue(peerBrowser)
     expect(actualText).toEqual(expectedText)
 
@@ -117,11 +116,17 @@ describe('mute App', () => {
 
     // Re-join the collaboration and share previous updates
     await browser.get('/test-e2e-share-updates-on-connection')
-    await browser.waitForAngular() // Join the network and send updates
-    await peerBrowser.waitForAngular() // Handle the updates
+    await waitUntilEditorNotEmpty(peerBrowser) // Handle the updates
+    await peerBrowser.waitForAngular()
     const actualText2 = await getEditorValue(peerBrowser)
     expect(actualText2).toEqual(expectedText)
 
     await peerBrowser.quit()
   })
 })
+
+const waitUntilEditorNotEmpty = async (currentBrowser: ProtractorBrowser): Promise<void> => {
+  await currentBrowser.wait(async () => {
+    return (await getEditorValue(currentBrowser)) !== ''
+  })
+}
