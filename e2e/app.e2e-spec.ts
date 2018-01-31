@@ -30,6 +30,7 @@ describe('mute App', () => {
     await browser.actions().sendKeys(expectedText).perform()
     await browser.waitForAngular()
     await browser.refresh()
+    await browser.waitForAngular()
     const actualText = await getEditorValue(browser)
     expect(actualText).toEqual(expectedText)
   })
