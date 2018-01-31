@@ -26,6 +26,7 @@ describe('mute App', () => {
   it('should store updates of the document', async () => {
     const expectedText = 'Hello world !'
     await browser.get('/test-e2e-recover')
+    await browser.waitForAngular()
     await focusEditor(browser)
     await browser.actions().sendKeys(expectedText).perform()
     await browser.waitForAngular()
@@ -64,6 +65,7 @@ describe('mute App', () => {
     const peerBrowser: ProtractorBrowser =  await browser.forkNewDriverInstance().ready
 
     await browser.get('/test-e2e-retrieve-doc-on-connection')
+    await browser.waitForAngular()
     await focusEditor(browser)
     await browser.actions().sendKeys(expectedText).perform()
 
@@ -83,6 +85,7 @@ describe('mute App', () => {
 
     // Edit a document
     await browser.get('/test-e2e-share-updates-on-connection')
+    await browser.waitForAngular()
     await focusEditor(browser)
     await browser.actions().sendKeys(expectedText).perform()
     await browser.waitForAngular()
@@ -90,13 +93,14 @@ describe('mute App', () => {
     // Leave the collaboration before other peer joins
     await browser.get('/')
     await peerBrowser.get('/test-e2e-share-updates-on-connection')
+    await peerBrowser.waitForAngular()
     const actualText1 = await getEditorValue(peerBrowser)
     expect(actualText1).toEqual('')
 
     // Re-join the collaboration and share previous updates
     await browser.get('/test-e2e-share-updates-on-connection')
-    await peerBrowser.waitForAngular()
-    await browser.waitForAngular()
+    await browser.waitForAngular() // Join the network and send updates
+    await peerBrowser.waitForAngular() // Handle the updates
     const actualText2 = await getEditorValue(peerBrowser)
     expect(actualText2).toEqual(expectedText)
 
