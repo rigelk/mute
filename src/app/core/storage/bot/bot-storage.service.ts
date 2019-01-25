@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { filter } from 'rxjs/operators'
 
+import { logging } from 'protractor'
 import { environment } from '../../../../environments/environment'
 import { Doc } from '../../Doc'
 import { EProperties } from '../../settings/EProperties'
@@ -25,6 +26,8 @@ export class BotStorageService extends Storage {
   public displayName: string
   public version: string
   public avatar: string
+  public login: string
+  public deviceID: string
   public httpURL: string
   public wsURL: string
 
@@ -48,6 +51,8 @@ export class BotStorageService extends Storage {
     if (!this.httpURL) {
       super.setStatus(BotStorageService.UNAVAILABLE)
     }
+    this.login = ''
+    this.deviceID = ''
 
     settings.onChange.pipe(filter((properties) => properties.includes(EProperties.profile))).subscribe(() => this.updateStatus())
   }
@@ -79,9 +84,9 @@ export class BotStorageService extends Storage {
     })) as Promise<void>
   }
 
-  get login() {
-    return this.httpURL ? `bot.storage@${new URL(this.httpURL).hostname}` : ''
-  }
+  // get login() {
+  //   return this.httpURL ? `bot.storage@${new URL(this.httpURL).hostname}` : ''
+  // }
 
   get id() {
     return `${this.httpURL}`
@@ -94,10 +99,13 @@ export class BotStorageService extends Storage {
       } else {
         return new Promise((resolve) => {
           this.http.get(`${this.httpURL}/info`).subscribe(
-            (info: { displayName: string; login: string; version: string; avatar: string }) => {
+            (info: { displayName: string; login: string; deviceID: string; version: string; avatar: string }) => {
               this.version = info.version
               this.avatar = info.avatar
               this.displayName = info.displayName
+              this.login = info.login
+              this.deviceID = info.deviceID
+
               super.setStatus(BotStorageService.AVAILABLE)
               resolve()
             },

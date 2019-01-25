@@ -66,7 +66,7 @@ export class PKRequest {
     return new Promise((resolve, reject) => {
       if (this.urlPrefix) {
         const url = `${this.urlPrefix}/${login}/${deviceID}`
-        this.http.put<IPK>(url, { pk } as IPK).subscribe(
+        this.http.put(url, { pk } as IPK).subscribe(
           () => {
             log.info('Signing KeyPair', `Public Key UPDATED in keyserver for ${login}:${deviceID}`, pk)
             resolve()
