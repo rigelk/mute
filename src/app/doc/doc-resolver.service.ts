@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core'
-import { MatDialog, MatSnackBar } from '@angular/material'
+import { MatDialog, MatSnackBar, MatSnackBarRef, SimpleSnackBar } from '@angular/material'
 import { ActivatedRouteSnapshot, CanDeactivate, Resolve, Router } from '@angular/router'
 
+import { KeyState } from '@coast-team/mute-crypto'
 import { environment } from '../../environments/environment'
 import { CryptoService } from '../core/crypto/crypto.service'
 import { Doc } from '../core/Doc'
@@ -15,6 +16,7 @@ import { ResolverDialogComponent } from './resolver-dialog/resolver-dialog.compo
 @Injectable()
 export class DocResolverService implements Resolve<Doc>, CanDeactivate<DocComponent> {
   private create: boolean
+  private snackBarRef: MatSnackBarRef<SimpleSnackBar>
   constructor(
     private router: Router,
     private snackBar: MatSnackBar,
@@ -66,6 +68,17 @@ export class DocResolverService implements Resolve<Doc>, CanDeactivate<DocCompon
       }
 
       doc.opened = new Date()
+
+      this.crypto.onStateChange.subscribe((keyState) => {
+        if (keyState === KeyState.CALCUL_IN_PROGRESS) {
+          this.snackBarRef = this.snackBar.open(`Computing a new document Key`, 'close', { duration: 2000 })
+        }
+        if (keyState === KeyState.READY) {
+          this.snackBarRef.afterDismissed().subscribe(() => {
+            this.snackBar.open(`A new document key has been created`, 'close', { duration: 3000 })
+          })
+        }
+      })
       return doc
     } catch (err) {
       this.snackBar.open(`Couldn't open a document. ${err.message}`, 'close', { duration: 5000 })
