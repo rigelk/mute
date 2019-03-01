@@ -1,5 +1,7 @@
 # MUTE: Multi User Text Editor
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/coast-team/mute.svg)](https://greenkeeper.io/)
+
 Web-based text editing tool that allows to edit documents collaboratively in real-time. It implements a CRDT-based consistency maintenance algorithm for strings for peer-to-peer large scale collaboration. This algorithm called LogootSplit can be seen as an extension for variable-sized elements (e.g. strings) of one of the basic CRDT algorithms for unit elements (e.g. characters). Compared to existing web-based collaborative text editing tool MUTE does not require a powerful central server since the server is not performing any computation. Communication between editor instances is done in a peer-to-peer manner thanks to the Netflux library that is based on WebRTC technology. Our editor offers support for working offline while still being able to reconnect at a later time.
 
 **Demo**: <https://www.coedit.re>
