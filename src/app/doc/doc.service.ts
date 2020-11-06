@@ -178,6 +178,11 @@ export class DocService implements OnDestroy {
         }
       })
     )
+    this.muteCore.localCollabUpdate$ = this.network.onStateChange.pipe(
+      filter((state) => state === WebGroupState.JOINED),
+      map(() => {
+        return { id: this.network.myId, displayName: this.settings.profile.displayName }
+    }))
 
     // Subscribe to Local and Remote Metadata change
     this.muteCore.localMetadataUpdate$ = merge(
