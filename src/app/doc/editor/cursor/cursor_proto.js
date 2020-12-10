@@ -74,9 +74,9 @@ $root.Cursor = (function() {
     Cursor.encode = function encode(message, writer) {
         if (!writer)
             writer = $Writer.create();
-        if (message.anchor != null && message.hasOwnProperty("anchor"))
+        if (message.anchor != null && Object.hasOwnProperty.call(message, "anchor"))
             $root.Position.encode(message.anchor, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-        if (message.head != null && message.hasOwnProperty("head"))
+        if (message.head != null && Object.hasOwnProperty.call(message, "head"))
             $root.Position.encode(message.head, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
         return writer;
     };
@@ -181,9 +181,9 @@ $root.Position = (function() {
     Position.encode = function encode(message, writer) {
         if (!writer)
             writer = $Writer.create();
-        if (message.id != null && message.hasOwnProperty("id"))
+        if (message.id != null && Object.hasOwnProperty.call(message, "id"))
             $root.sync.IdentifierMsg.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-        if (message.index != null && message.hasOwnProperty("index"))
+        if (message.index != null && Object.hasOwnProperty.call(message, "index"))
             writer.uint32(/* id 2, wireType 0 =*/16).int32(message.index);
         return writer;
     };
@@ -311,9 +311,9 @@ $root.sync = (function() {
         RichOperationMsg.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.richLogootSOpsMsg != null && message.hasOwnProperty("richLogootSOpsMsg"))
+            if (message.richLogootSOpsMsg != null && Object.hasOwnProperty.call(message, "richLogootSOpsMsg"))
                 $root.sync.RichLogootSOperationMsg.encode(message.richLogootSOpsMsg, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-            if (message.richDottedLogootsOpsMsg != null && message.hasOwnProperty("richDottedLogootsOpsMsg"))
+            if (message.richDottedLogootsOpsMsg != null && Object.hasOwnProperty.call(message, "richDottedLogootsOpsMsg"))
                 $root.sync.RichDottedLogootSOperationMsg.encode(message.richDottedLogootsOpsMsg, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
             return writer;
         };
@@ -441,11 +441,11 @@ $root.sync = (function() {
         SyncMsg.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.richOpMsg != null && message.hasOwnProperty("richOpMsg"))
+            if (message.richOpMsg != null && Object.hasOwnProperty.call(message, "richOpMsg"))
                 $root.sync.RichOperationMsg.encode(message.richOpMsg, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-            if (message.querySync != null && message.hasOwnProperty("querySync"))
+            if (message.querySync != null && Object.hasOwnProperty.call(message, "querySync"))
                 $root.sync.QuerySyncMsg.encode(message.querySync, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-            if (message.replySync != null && message.hasOwnProperty("replySync"))
+            if (message.replySync != null && Object.hasOwnProperty.call(message, "replySync"))
                 $root.sync.ReplySyncMsg.encode(message.replySync, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
             return writer;
         };
@@ -545,7 +545,7 @@ $root.sync = (function() {
         QuerySyncMsg.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.vector != null && message.hasOwnProperty("vector"))
+            if (message.vector != null && Object.hasOwnProperty.call(message, "vector"))
                 for (var keys = Object.keys(message.vector), i = 0; i < keys.length; ++i)
                     writer.uint32(/* id 1, wireType 2 =*/10).fork().uint32(/* id 1, wireType 0 =*/8).int32(keys[i]).uint32(/* id 2, wireType 0 =*/16).int32(message.vector[keys[i]]).ldelim();
             return writer;
@@ -565,17 +565,31 @@ $root.sync = (function() {
         QuerySyncMsg.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.sync.QuerySyncMsg(), key;
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.sync.QuerySyncMsg(), key, value;
             while (reader.pos < end) {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1:
-                    reader.skip().pos++;
                     if (message.vector === $util.emptyObject)
                         message.vector = {};
-                    key = reader.int32();
-                    reader.pos++;
-                    message.vector[key] = reader.int32();
+                    var end2 = reader.uint32() + reader.pos;
+                    key = 0;
+                    value = 0;
+                    while (reader.pos < end2) {
+                        var tag2 = reader.uint32();
+                        switch (tag2 >>> 3) {
+                        case 1:
+                            key = reader.int32();
+                            break;
+                        case 2:
+                            value = reader.int32();
+                            break;
+                        default:
+                            reader.skipType(tag2 & 7);
+                            break;
+                        }
+                    }
+                    message.vector[key] = value;
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -883,13 +897,13 @@ $root.sync = (function() {
         IdentifierTupleMsg.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.random != null && message.hasOwnProperty("random"))
+            if (message.random != null && Object.hasOwnProperty.call(message, "random"))
                 writer.uint32(/* id 1, wireType 0 =*/8).int32(message.random);
-            if (message.replicaNumber != null && message.hasOwnProperty("replicaNumber"))
+            if (message.replicaNumber != null && Object.hasOwnProperty.call(message, "replicaNumber"))
                 writer.uint32(/* id 2, wireType 0 =*/16).int32(message.replicaNumber);
-            if (message.clock != null && message.hasOwnProperty("clock"))
+            if (message.clock != null && Object.hasOwnProperty.call(message, "clock"))
                 writer.uint32(/* id 3, wireType 0 =*/24).int32(message.clock);
-            if (message.offset != null && message.hasOwnProperty("offset"))
+            if (message.offset != null && Object.hasOwnProperty.call(message, "offset"))
                 writer.uint32(/* id 4, wireType 0 =*/32).int32(message.offset);
             return writer;
         };
@@ -1000,9 +1014,9 @@ $root.sync = (function() {
         IdentifierIntervalMsg.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.idBegin != null && message.hasOwnProperty("idBegin"))
+            if (message.idBegin != null && Object.hasOwnProperty.call(message, "idBegin"))
                 $root.sync.IdentifierMsg.encode(message.idBegin, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-            if (message.end != null && message.hasOwnProperty("end"))
+            if (message.end != null && Object.hasOwnProperty.call(message, "end"))
                 writer.uint32(/* id 2, wireType 0 =*/16).int32(message.end);
             return writer;
         };
@@ -1116,11 +1130,11 @@ $root.sync = (function() {
         IntervalMsg.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.id != null && message.hasOwnProperty("id"))
+            if (message.id != null && Object.hasOwnProperty.call(message, "id"))
                 writer.uint32(/* id 1, wireType 0 =*/8).int32(message.id);
-            if (message.begin != null && message.hasOwnProperty("begin"))
+            if (message.begin != null && Object.hasOwnProperty.call(message, "begin"))
                 writer.uint32(/* id 2, wireType 0 =*/16).int32(message.begin);
-            if (message.end != null && message.hasOwnProperty("end"))
+            if (message.end != null && Object.hasOwnProperty.call(message, "end"))
                 writer.uint32(/* id 3, wireType 0 =*/24).int32(message.end);
             return writer;
         };
@@ -1270,15 +1284,15 @@ $root.sync = (function() {
         RichLogootSOperationMsg.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.id != null && message.hasOwnProperty("id"))
+            if (message.id != null && Object.hasOwnProperty.call(message, "id"))
                 writer.uint32(/* id 1, wireType 0 =*/8).int32(message.id);
-            if (message.clock != null && message.hasOwnProperty("clock"))
+            if (message.clock != null && Object.hasOwnProperty.call(message, "clock"))
                 writer.uint32(/* id 2, wireType 0 =*/16).int32(message.clock);
-            if (message.logootSAddMsg != null && message.hasOwnProperty("logootSAddMsg"))
+            if (message.logootSAddMsg != null && Object.hasOwnProperty.call(message, "logootSAddMsg"))
                 $root.sync.LogootSAddMsg.encode(message.logootSAddMsg, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
-            if (message.logootSDelMsg != null && message.hasOwnProperty("logootSDelMsg"))
+            if (message.logootSDelMsg != null && Object.hasOwnProperty.call(message, "logootSDelMsg"))
                 $root.sync.LogootSDelMsg.encode(message.logootSDelMsg, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
-            if (message.dependencies != null && message.hasOwnProperty("dependencies"))
+            if (message.dependencies != null && Object.hasOwnProperty.call(message, "dependencies"))
                 for (var keys = Object.keys(message.dependencies), i = 0; i < keys.length; ++i)
                     writer.uint32(/* id 5, wireType 2 =*/42).fork().uint32(/* id 1, wireType 0 =*/8).int32(keys[i]).uint32(/* id 2, wireType 0 =*/16).int32(message.dependencies[keys[i]]).ldelim();
             return writer;
@@ -1298,7 +1312,7 @@ $root.sync = (function() {
         RichLogootSOperationMsg.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.sync.RichLogootSOperationMsg(), key;
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.sync.RichLogootSOperationMsg(), key, value;
             while (reader.pos < end) {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
@@ -1315,12 +1329,26 @@ $root.sync = (function() {
                     message.logootSDelMsg = $root.sync.LogootSDelMsg.decode(reader, reader.uint32());
                     break;
                 case 5:
-                    reader.skip().pos++;
                     if (message.dependencies === $util.emptyObject)
                         message.dependencies = {};
-                    key = reader.int32();
-                    reader.pos++;
-                    message.dependencies[key] = reader.int32();
+                    var end2 = reader.uint32() + reader.pos;
+                    key = 0;
+                    value = 0;
+                    while (reader.pos < end2) {
+                        var tag2 = reader.uint32();
+                        switch (tag2 >>> 3) {
+                        case 1:
+                            key = reader.int32();
+                            break;
+                        case 2:
+                            value = reader.int32();
+                            break;
+                        default:
+                            reader.skipType(tag2 & 7);
+                            break;
+                        }
+                    }
+                    message.dependencies[key] = value;
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -1398,9 +1426,9 @@ $root.sync = (function() {
         LogootSAddMsg.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.id != null && message.hasOwnProperty("id"))
+            if (message.id != null && Object.hasOwnProperty.call(message, "id"))
                 $root.sync.IdentifierMsg.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-            if (message.content != null && message.hasOwnProperty("content"))
+            if (message.content != null && Object.hasOwnProperty.call(message, "content"))
                 writer.uint32(/* id 2, wireType 2 =*/18).string(message.content);
             return writer;
         };
@@ -1509,7 +1537,7 @@ $root.sync = (function() {
             if (message.lid != null && message.lid.length)
                 for (var i = 0; i < message.lid.length; ++i)
                     $root.sync.IdentifierIntervalMsg.encode(message.lid[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-            if (message.author != null && message.hasOwnProperty("author"))
+            if (message.author != null && Object.hasOwnProperty.call(message, "author"))
                 writer.uint32(/* id 2, wireType 0 =*/16).int32(message.author);
             return writer;
         };
@@ -1635,13 +1663,13 @@ $root.sync = (function() {
         RichDottedLogootSOperationMsg.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.id != null && message.hasOwnProperty("id"))
+            if (message.id != null && Object.hasOwnProperty.call(message, "id"))
                 writer.uint32(/* id 1, wireType 0 =*/8).int32(message.id);
-            if (message.clock != null && message.hasOwnProperty("clock"))
+            if (message.clock != null && Object.hasOwnProperty.call(message, "clock"))
                 writer.uint32(/* id 2, wireType 0 =*/16).int32(message.clock);
-            if (message.blockOperationMsg != null && message.hasOwnProperty("blockOperationMsg"))
+            if (message.blockOperationMsg != null && Object.hasOwnProperty.call(message, "blockOperationMsg"))
                 $root.sync.DottedLogootSBlockMsg.encode(message.blockOperationMsg, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
-            if (message.dependencies != null && message.hasOwnProperty("dependencies"))
+            if (message.dependencies != null && Object.hasOwnProperty.call(message, "dependencies"))
                 for (var keys = Object.keys(message.dependencies), i = 0; i < keys.length; ++i)
                     writer.uint32(/* id 4, wireType 2 =*/34).fork().uint32(/* id 1, wireType 0 =*/8).int32(keys[i]).uint32(/* id 2, wireType 0 =*/16).int32(message.dependencies[keys[i]]).ldelim();
             return writer;
@@ -1661,7 +1689,7 @@ $root.sync = (function() {
         RichDottedLogootSOperationMsg.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.sync.RichDottedLogootSOperationMsg(), key;
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.sync.RichDottedLogootSOperationMsg(), key, value;
             while (reader.pos < end) {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
@@ -1675,12 +1703,26 @@ $root.sync = (function() {
                     message.blockOperationMsg = $root.sync.DottedLogootSBlockMsg.decode(reader, reader.uint32());
                     break;
                 case 4:
-                    reader.skip().pos++;
                     if (message.dependencies === $util.emptyObject)
                         message.dependencies = {};
-                    key = reader.int32();
-                    reader.pos++;
-                    message.dependencies[key] = reader.int32();
+                    var end2 = reader.uint32() + reader.pos;
+                    key = 0;
+                    value = 0;
+                    while (reader.pos < end2) {
+                        var tag2 = reader.uint32();
+                        switch (tag2 >>> 3) {
+                        case 1:
+                            key = reader.int32();
+                            break;
+                        case 2:
+                            value = reader.int32();
+                            break;
+                        default:
+                            reader.skipType(tag2 & 7);
+                            break;
+                        }
+                    }
+                    message.dependencies[key] = value;
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -1781,11 +1823,11 @@ $root.sync = (function() {
         DottedLogootSBlockMsg.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.lowerPos != null && message.hasOwnProperty("lowerPos"))
+            if (message.lowerPos != null && Object.hasOwnProperty.call(message, "lowerPos"))
                 $root.sync.SimpleDotPos.encode(message.lowerPos, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-            if (message.content != null && message.hasOwnProperty("content"))
+            if (message.content != null && Object.hasOwnProperty.call(message, "content"))
                 writer.uint32(/* id 2, wireType 2 =*/18).string(message.content);
-            if (message.concatLength != null && message.hasOwnProperty("concatLength"))
+            if (message.concatLength != null && Object.hasOwnProperty.call(message, "concatLength"))
                 $root.sync.ConcatLength.encode(message.concatLength, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
             return writer;
         };
@@ -1884,7 +1926,7 @@ $root.sync = (function() {
         ConcatLength.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.length != null && message.hasOwnProperty("length"))
+            if (message.length != null && Object.hasOwnProperty.call(message, "length"))
                 writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.length);
             return writer;
         };
@@ -1995,11 +2037,11 @@ $root.sync = (function() {
         SimpleDotPosPart.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.priority != null && message.hasOwnProperty("priority"))
+            if (message.priority != null && Object.hasOwnProperty.call(message, "priority"))
                 writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.priority);
-            if (message.replica != null && message.hasOwnProperty("replica"))
+            if (message.replica != null && Object.hasOwnProperty.call(message, "replica"))
                 writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.replica);
-            if (message.seq != null && message.hasOwnProperty("seq"))
+            if (message.seq != null && Object.hasOwnProperty.call(message, "seq"))
                 writer.uint32(/* id 3, wireType 0 =*/24).uint32(message.seq);
             return writer;
         };

@@ -8,6 +8,9 @@ export interface IMessage {
     /** Message subtype */
     subtype?: (number|null);
 
+    /** Message senderId */
+    senderId?: (number|null);
+
     /** Message content */
     content?: (Uint8Array|null);
 }
@@ -26,6 +29,9 @@ export class Message implements IMessage {
 
     /** Message subtype. */
     public subtype: number;
+
+    /** Message senderId. */
+    public senderId: number;
 
     /** Message content. */
     public content: Uint8Array;

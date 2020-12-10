@@ -3,5 +3,6 @@ syntax = "proto3";
 message Message {
   uint32 type = 1;
   uint32 subtype = 2;
-  bytes content = 3;
+  sint32 senderId = 3;
+  bytes content = 4;
 }

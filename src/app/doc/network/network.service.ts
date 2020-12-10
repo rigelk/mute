@@ -13,6 +13,7 @@ import { EncryptionType } from '../../core/crypto/EncryptionType'
 import { Doc } from '../../core/Doc'
 import { Message } from './message_proto'
 import { PulsarService } from './pulsar.service'
+import { IdTable } from './IdTable'
 
 @Injectable()
 export class NetworkService implements OnDestroy {
@@ -38,6 +39,8 @@ export class NetworkService implements OnDestroy {
   // Other
   private subs: Subscription[]
   private _pulsarOn: boolean
+  private myMuteCoreId: number
+  private idTable: IdTable
 
   constructor(
     private zone: NgZone,
@@ -47,6 +50,7 @@ export class NetworkService implements OnDestroy {
   ) {
     this.botUrls = []
     this.subs = []
+    this.myMuteCoreId = 0
 
     // Initialize subjects
     this.memberJoinSubject = new Subject()
@@ -56,6 +60,8 @@ export class NetworkService implements OnDestroy {
     this.messageSubject = new Subject()
 
     this.leaveSubject = new Subject()
+
+    this.idTable = new IdTable()
 
     this.zone.runOutsideAngular(() => {
       this.wg = new WebGroup({
@@ -81,6 +87,15 @@ export class NetworkService implements OnDestroy {
       }
     })
   }
+
+
+  public setMyMuteCoreId(muteCoreId: number) {
+    this.myMuteCoreId = muteCoreId
+  }
+
+
+
+
 
   leave() {
     this.wg.leave()
@@ -202,6 +217,7 @@ export class NetworkService implements OnDestroy {
 
   join(key: string) {
     this.wg.join(key)
+    this.idTable.addNewValue(this.wg.myId, this.myMuteCoreId)
     this.route.data.subscribe(({ doc }: { doc: Doc }) => {
       // for the one who create the doc
       this._pulsarOn = doc.pulsar || this._pulsarOn
@@ -253,8 +269,8 @@ export class NetworkService implements OnDestroy {
 
   send(streamId: StreamId, content: Uint8Array, id?: number): void {
     if (this.members.length > 1) {
-      const msg = Message.create({ type: streamId.type, subtype: streamId.subtype, content })
-
+      //const msg = Message.create({ type: streamId.type, subtype: streamId.subtype, content: content })
+      const msg = Message.create({ type: streamId.type, subtype: streamId.subtype, senderId: this.myMuteCoreId ,content: content })
       if (id === undefined) {
         this.wg.send(Message.encode(msg).finish())
       } else {
@@ -292,9 +308,12 @@ export class NetworkService implements OnDestroy {
       }
       this.stateSubject.next(state)
     }
-    this.wg.onMessage = (id, bytes: Uint8Array) => {
+    this.wg.onMessage = (id, bytes: Uint8Array) => { // ici id est le networkId et senderId est le muteCoreId
       try {
-        const { type, subtype, content } = Message.decode(bytes)
+        const { type, subtype, senderId, content } = Message.decode(bytes)
+
+        this.idTable.addNewValue(id, senderId)
+
         if (type === MuteCryptoStreams.KEY_AGREEMENT_BD) {
           this.cryptoService.onBDMessage(id, content)
         } else {
@@ -332,9 +351,12 @@ export class NetworkService implements OnDestroy {
     this.wg.onMemberLeave = (id) => this.memberLeaveSubject.next(id)
     this.wg.onStateChange = (state: WebGroupState) => this.stateSubject.next(state)
 
-    this.wg.onMessage = (id, bytes: Uint8Array) => {
+    this.wg.onMessage = (id, bytes: Uint8Array) => {  // ici id est le networkId et senderId est le muteCoreId
       try {
-        const { type, subtype, content } = Message.decode(bytes)
+        const { type, subtype, senderId, content } = Message.decode(bytes)
+        
+        this.idTable.addNewValue(id, senderId)
+        
         if (type === MuteCoreStreams.DOCUMENT_CONTENT) {
           this.cryptoService.crypto
             .decrypt(content)
@@ -357,9 +379,12 @@ export class NetworkService implements OnDestroy {
     this.wg.onMemberLeave = (id) => this.memberLeaveSubject.next(id)
     this.wg.onStateChange = (state: WebGroupState) => this.stateSubject.next(state)
 
-    this.wg.onMessage = (id, bytes: Uint8Array) => {
+    this.wg.onMessage = (id, bytes: Uint8Array) => { // ici id est le networkId et senderId est le muteCoreId
       try {
-        const { type, subtype, content } = Message.decode(bytes)
+        const { type, subtype, senderId, content } = Message.decode(bytes)
+        
+        this.idTable.addNewValue(id, senderId)
+        
         this.messageSubject.next({ streamId: { type, subtype }, content, senderId: id })
       } catch (err) {
         log.warn('Message from network decode error: ', err.message)

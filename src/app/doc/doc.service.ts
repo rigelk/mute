@@ -240,6 +240,9 @@ export class DocService implements OnDestroy {
       })
     }
 
+    this.network.setMyMuteCoreId(this.muteCore.myMuteCoreId)
+
+
     // Start join the collaboration session
     this.network.join(this.doc.signalingKey)
   }
@@ -421,4 +424,6 @@ export class DocService implements OnDestroy {
   public get initSubject(): Observable<string> {
     return this.initSubject$.asObservable()
   }
+
+
 }
