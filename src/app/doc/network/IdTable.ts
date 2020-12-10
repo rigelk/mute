@@ -104,15 +104,6 @@ export class IdTable {
         }
     }
 
-
-    contains(muteCoreId: number): boolean {
-        let res = false
-        if(this.getIndexOf(muteCoreId) !== -1) {
-            res = true
-        }
-        return res
-    }
-
     /**
      * Retourne l'index du couple ayant pour muteCoreId le param (-1 s'il n'existe pas)
      * @param muteCoreId number

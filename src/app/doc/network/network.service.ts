@@ -61,6 +61,7 @@ export class NetworkService implements OnDestroy {
 
     this.leaveSubject = new Subject()
 
+    // Initialize id correspondance table
     this.idTable = new IdTable()
 
     this.zone.runOutsideAngular(() => {
@@ -88,13 +89,13 @@ export class NetworkService implements OnDestroy {
     })
   }
 
-
+  /**
+   * Initialise la variable this.myMuteCoreId
+   * @param muteCoreId correspodant à mon instance mute-core
+   */
   public setMyMuteCoreId(muteCoreId: number) {
     this.myMuteCoreId = muteCoreId
   }
-
-
-
 
 
   leave() {
@@ -217,7 +218,10 @@ export class NetworkService implements OnDestroy {
 
   join(key: string) {
     this.wg.join(key)
+
+    // On s'ajoute à la table des correspondance
     this.idTable.addNewValue(this.wg.myId, this.myMuteCoreId)
+
     this.route.data.subscribe(({ doc }: { doc: Doc }) => {
       // for the one who create the doc
       this._pulsarOn = doc.pulsar || this._pulsarOn
@@ -312,6 +316,7 @@ export class NetworkService implements OnDestroy {
       try {
         const { type, subtype, senderId, content } = Message.decode(bytes)
 
+        // Dès qu'on reçoit un message, on donne les ids à IdTable qui va mettre à jour la table
         this.idTable.addNewValue(id, senderId)
 
         if (type === MuteCryptoStreams.KEY_AGREEMENT_BD) {
@@ -355,6 +360,7 @@ export class NetworkService implements OnDestroy {
       try {
         const { type, subtype, senderId, content } = Message.decode(bytes)
         
+        // Dès qu'on reçoit un message, on donne les ids à IdTable qui va mettre à jour la table
         this.idTable.addNewValue(id, senderId)
         
         if (type === MuteCoreStreams.DOCUMENT_CONTENT) {
@@ -383,6 +389,7 @@ export class NetworkService implements OnDestroy {
       try {
         const { type, subtype, senderId, content } = Message.decode(bytes)
         
+        // Dès qu'on reçoit un message, on donne les ids à IdTable qui va mettre à jour la table
         this.idTable.addNewValue(id, senderId)
         
         this.messageSubject.next({ streamId: { type, subtype }, content, senderId: id })
