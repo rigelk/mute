@@ -104,6 +104,7 @@ export class NetworkService implements OnDestroy {
 
   setMessageIn(source: Observable<{ streamId: StreamId; content: Uint8Array; recipientId?: number }>) {
     this.subs[this.subs.length] = source.subscribe(({ streamId, content, recipientId }) => {
+      recipientId = this.idTable.getNetworkId(recipientId)
       if (streamId.type === MuteCoreStreams.DOCUMENT_CONTENT && environment.cryptography.type !== EncryptionType.NONE) {
         if (
           !recipientId &&
@@ -326,12 +327,14 @@ export class NetworkService implements OnDestroy {
             this.cryptoService.crypto
               .decrypt(content)
               .then((decryptedContent) => {
-                this.messageSubject.next({ streamId: { type, subtype }, content: decryptedContent, senderId: id })
+                this.messageSubject.next({ streamId: { type, subtype }, content: decryptedContent, senderId: senderId }) // on transmet le message avec le muteCoreId
+                //this.messageSubject.next({ streamId: { type, subtype }, content: decryptedContent, senderId: id })
               })
               .catch((err) => {})
             return
           }
-          this.messageSubject.next({ streamId: { type, subtype }, content, senderId: id })
+          this.messageSubject.next({ streamId: { type, subtype }, content, senderId: senderId }) // on transmet le message avec le muteCoreId
+          //this.messageSubject.next({ streamId: { type, subtype }, content, senderId: id })
         }
       } catch (err) {
         log.warn('Message from network decode error: ', err.message)
@@ -367,12 +370,14 @@ export class NetworkService implements OnDestroy {
           this.cryptoService.crypto
             .decrypt(content)
             .then((decryptedContent) => {
-              this.messageSubject.next({ streamId: { type, subtype }, content: decryptedContent, senderId: id })
+              this.messageSubject.next({ streamId: { type, subtype }, content: decryptedContent, senderId: senderId }) // on transmet le message avec le muteCoreId
+              //this.messageSubject.next({ streamId: { type, subtype }, content: decryptedContent, senderId: id })
             })
             .catch((err) => {})
           return
         }
-        this.messageSubject.next({ streamId: { type, subtype }, content, senderId: id })
+        this.messageSubject.next({ streamId: { type, subtype }, content, senderId: senderId }) // on transmet le message avec le muteCoreId
+        //this.messageSubject.next({ streamId: { type, subtype }, content, senderId: id })
       } catch (err) {
         log.warn('Message from network decode error: ', err.message)
       }
@@ -392,10 +397,16 @@ export class NetworkService implements OnDestroy {
         // Dès qu'on reçoit un message, on donne les ids à IdTable qui va mettre à jour la table
         this.idTable.addNewValue(id, senderId)
         
-        this.messageSubject.next({ streamId: { type, subtype }, content, senderId: id })
+        this.messageSubject.next({ streamId: { type, subtype }, content, senderId: senderId }) // on transmet le message avec le muteCoreId
+        //this.messageSubject.next({ streamId: { type, subtype }, content, senderId: id })
       } catch (err) {
         log.warn('Message from network decode error: ', err.message)
       }
     }
+  }
+
+
+  getNetworkIdOfCollab(muteCoreId: number) {
+    return this.idTable.getNetworkId(muteCoreId)
   }
 }

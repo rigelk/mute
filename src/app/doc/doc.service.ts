@@ -167,21 +167,21 @@ export class DocService implements OnDestroy {
       map((props) => {
         if (props.includes(EProperties.profile)) {
           return {
-            id: this.network.myId,
+            muteCoreId: this.network.myId,
             displayName: this.settings.profile.displayName,
             login: this.settings.profile.login,
             email: this.settings.profile.email,
             avatar: this.settings.profile.avatar,
           }
         } else {
-          return { id: this.network.myId, displayName: this.settings.profile.displayName }
+          return { muteCoreId: this.network.myId, displayName: this.settings.profile.displayName }
         }
       })
     )
     this.muteCore.localCollabUpdate$ = this.network.onStateChange.pipe(
       filter((state) => state === WebGroupState.JOINED),
       map(() => {
-        return { id: this.network.myId, displayName: this.settings.profile.displayName }
+        return { muteCoreId: this.network.myId, displayName: this.settings.profile.displayName }
     }))
 
     // Subscribe to Local and Remote Metadata change
@@ -227,13 +227,15 @@ export class DocService implements OnDestroy {
 
     // Config assymetric cryptography
     if (environment.cryptography.coniksClient) {
-      this.collabs.onJoin.subscribe(({ id, login }) =>
+      this.collabs.onJoin.subscribe(({ muteCoreId, login }) => {
+        let id = this.network.getNetworkIdOfCollab(muteCoreId)
         this.crypto.verifyLoginPKConiks(id, login).catch((err) => {
           log.info('Failed to retreive Public Key of ' + login)
         })
-      )
+      })
     } else if (environment.cryptography.keyserver) {
-      this.collabs.onJoin.subscribe(({ id, login, deviceID }) => {
+      this.collabs.onJoin.subscribe(({ muteCoreId, login, deviceID }) => {
+        let id = this.network.getNetworkIdOfCollab(muteCoreId)
         return this.crypto.verifyLoginPK(id, login, deviceID).catch((err) => {
           log.info('Failed to retreive Public Key of ' + login)
         })
@@ -326,12 +328,12 @@ export class DocService implements OnDestroy {
 
     this.subs.push(
       this.muteCore.collabJoin$.subscribe((c: ICollaborator) => {
-        this.logs.log({ type: 'collaboratorJoin', timestamp: Date.now(), siteId, remoteSiteId: c.muteCoreId, remoteNetworkId: c.id })
+        this.logs.log({ type: 'collaboratorJoin', timestamp: Date.now(), siteId, remoteSiteId: c.muteCoreId, remoteNetworkId: this.network.getNetworkIdOfCollab(c.muteCoreId) })
       })
     )
     this.subs.push(
       this.muteCore.collabLeave$.subscribe((c: ICollaborator) => {
-        this.logs.log({ type: 'collaboratorLeave', timestamp: Date.now(), siteId, remoteSiteId: c.muteCoreId, remoteNetworkId: c.id })
+        this.logs.log({ type: 'collaboratorLeave', timestamp: Date.now(), siteId, remoteSiteId: c.muteCoreId, remoteNetworkId: this.network.getNetworkIdOfCollab(c.muteCoreId) })
       })
     )
 

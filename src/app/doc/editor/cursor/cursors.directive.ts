@@ -43,7 +43,7 @@ export class CursorsDirective implements OnInit, OnDestroy {
     // When a new peer joins
     this.subs.push(
       this.collabService.onJoin.subscribe((collab: RichCollaborator) => {
-        this.cursors.set(collab.id, new CollaboratorCursor(this.cm, collab))
+        this.cursors.set(collab.muteCoreId, new CollaboratorCursor(this.cm, collab))
         if (this.cm.hasFocus()) {
           this.sendMyCursorPos()
         }
@@ -64,7 +64,7 @@ export class CursorsDirective implements OnInit, OnDestroy {
     // When the peer changes his display name
     this.subs.push(
       this.collabService.onUpdate.subscribe((collab: RichCollaborator) => {
-        const cursor = this.cursors.get(collab.id)
+        const cursor = this.cursors.get(collab.muteCoreId)
         if (cursor !== undefined) {
           cursor.updateDisplayName(collab.displayName)
         }
@@ -123,7 +123,7 @@ export class CursorsDirective implements OnInit, OnDestroy {
       this.docService.doc.remoteContentChanges.subscribe((ops) => {
         ops.forEach(({ collaborator }) => {
           if (collaborator) {
-            const cursor = this.cursors.get(collaborator.id)
+            const cursor = this.cursors.get(collaborator.muteCoreId)
             if (cursor) {
               cursor.resetDisplayNameTimeout()
             }

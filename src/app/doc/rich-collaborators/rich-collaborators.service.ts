@@ -72,7 +72,7 @@ export class RichCollaboratorsService implements OnDestroy {
     this.subs.push(
       source.subscribe((collab: ICollaborator) => {
         for (const c of this.collaborators) {
-          if (collab.id === c.id) {
+          if (collab.muteCoreId === c.muteCoreId) {
             c.update(collab)
             this.updateSubject.next(c)
             break
@@ -95,10 +95,10 @@ export class RichCollaboratorsService implements OnDestroy {
   subscribeToLeaveSource(source: Observable<ICollaborator>) {
     this.subs.push(
       source.subscribe((collaborator: ICollaborator) => {
-        const index = this.collaborators.findIndex((c) => c.id === collaborator.id)
+        const index = this.collaborators.findIndex((c) => c.muteCoreId === collaborator.muteCoreId)
         this.colors.dismiss(this.collaborators[index].color)
         this.collaborators.splice(index, 1)
-        this.leaveSubject.next(collaborator.id)
+        this.leaveSubject.next(collaborator.muteCoreId)
       })
     )
   }
@@ -106,7 +106,7 @@ export class RichCollaboratorsService implements OnDestroy {
   private createMe(profile: Profile): RichCollaborator {
     return new RichCollaborator(
       {
-        id: -1,
+        muteCoreId: -1,
         login: profile.login,
         displayName: profile.displayName,
         deviceID: profile.deviceID,

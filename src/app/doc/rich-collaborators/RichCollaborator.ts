@@ -1,7 +1,7 @@
 import { ICollaborator } from '@coast-team/mute-core'
 
 export class RichCollaborator {
-  public id: number
+  public muteCoreId: number
   public login: string
   public displayName: string
   public email: string
@@ -10,7 +10,7 @@ export class RichCollaborator {
   public deviceID: string
 
   constructor(collab: ICollaborator, color: string) {
-    this.id = collab.id
+    this.muteCoreId = collab.muteCoreId
     this.update(collab)
     this.color = color
   }
